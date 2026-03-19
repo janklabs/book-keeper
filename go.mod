@@ -1,4 +1,4 @@
-module github.com/kvqn/book-keeper
+module github.com/janklabs/book-keeper
 
 go 1.25.3
 
