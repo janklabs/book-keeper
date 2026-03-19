@@ -1,0 +1,7 @@
+{
+  "name": "book-keeper",
+  "private": true,
+  "devDependencies": {
+    "semantic-release": "^24.0.0"
+  }
+}

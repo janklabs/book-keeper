@@ -1,4 +1,5 @@
 book-keeper
+node_modules/
 data/
 library/
 ingestion/

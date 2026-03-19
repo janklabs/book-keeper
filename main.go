@@ -7,6 +7,8 @@ import (
 	"syscall"
 )
 
+var version = "dev"
+
 func main() {
 	cfg, err := LoadConfig()
 	if err != nil {
@@ -32,7 +34,7 @@ func main() {
 	}
 	watcher.Start()
 
-	log.Printf("book-keeper is running. WATCH_DIR=%s INGESTION_DIR=%s", cfg.WatchDir, cfg.IngestionDir)
+	log.Printf("book-keeper %s is running. WATCH_DIR=%s INGESTION_DIR=%s", version, cfg.WatchDir, cfg.IngestionDir)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
