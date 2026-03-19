@@ -1,0 +1,14 @@
+services:
+  book-keeper:
+    image: kvqn/book-keeper:latest
+    environment:
+      - WATCH_DIR=/watch
+      - INGESTION_DIR=/ingestion
+      - RECORDS_FILE=/data/records.json
+      - STABILIZATION_SECS=5
+      - SCAN_ON_STARTUP=true
+    volumes:
+      - ./library:/watch:ro
+      - ./ingestion:/ingestion
+      - ./data:/data
+    restart: unless-stopped

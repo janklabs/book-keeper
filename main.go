@@ -1,0 +1,44 @@
+package main
+
+import (
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+)
+
+func main() {
+	cfg, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("Configuration error: %v", err)
+	}
+
+	store, err := NewRecordStore(cfg.RecordsFile)
+	if err != nil {
+		log.Fatalf("Failed to load records: %v", err)
+	}
+
+	copier := NewCopier(cfg, store)
+
+	if cfg.ScanOnStartup {
+		if err := ScanExisting(cfg, copier); err != nil {
+			log.Fatalf("Initial scan failed: %v", err)
+		}
+	}
+
+	watcher, err := NewWatcher(cfg, copier)
+	if err != nil {
+		log.Fatalf("Failed to start watcher: %v", err)
+	}
+	watcher.Start()
+
+	log.Printf("book-keeper is running. WATCH_DIR=%s INGESTION_DIR=%s", cfg.WatchDir, cfg.IngestionDir)
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+	<-sigCh
+
+	log.Println("Shutting down...")
+	watcher.Stop()
+	log.Println("Stopped.")
+}
