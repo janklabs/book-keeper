@@ -46,8 +46,8 @@ All configuration is done through environment variables.
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
-| `WATCH_DIR` | Yes | — | Source directory to monitor |
-| `INGESTION_DIR` | Yes | — | Destination directory for copies |
+| `WATCH_DIR` | No | `/watch` | Source directory to monitor |
+| `INGESTION_DIR` | No | `/ingestion` | Destination directory for copies |
 | `RECORDS_FILE` | No | `/data/records.json` | Path to the state file |
 | `STABILIZATION_SECS` | No | `5` | Seconds to wait for a file to stop changing before copying |
 | `SCAN_ON_STARTUP` | No | `true` | Scan for existing files on startup |

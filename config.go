@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -18,19 +17,12 @@ type Config struct {
 
 func LoadConfig() (Config, error) {
 	cfg := Config{
-		WatchDir:           os.Getenv("WATCH_DIR"),
-		IngestionDir:       os.Getenv("INGESTION_DIR"),
+		WatchDir:           envOrDefault("WATCH_DIR", "/watch"),
+		IngestionDir:       envOrDefault("INGESTION_DIR", "/ingestion"),
 		RecordsFile:        envOrDefault("RECORDS_FILE", "/data/records.json"),
 		StabilizationDelay: time.Duration(envIntOrDefault("STABILIZATION_SECS", 5)) * time.Second,
 		ScanOnStartup:      envBoolOrDefault("SCAN_ON_STARTUP", true),
 		PollInterval:       time.Duration(envIntOrDefault("POLL_INTERVAL_SECS", 0)) * time.Second,
-	}
-
-	if cfg.WatchDir == "" {
-		return cfg, fmt.Errorf("WATCH_DIR environment variable is required")
-	}
-	if cfg.IngestionDir == "" {
-		return cfg, fmt.Errorf("INGESTION_DIR environment variable is required")
 	}
 
 	return cfg, nil
