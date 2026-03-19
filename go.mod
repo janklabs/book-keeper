@@ -1,6 +1,6 @@
 module github.com/janklabs/book-keeper
 
-go 1.25.3
+go 1.23
 
 require (
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
