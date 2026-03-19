@@ -106,7 +106,7 @@ jobs:
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
-          tags: ci
+          tags: tag:ci
       - name: Make .ssh folder
         run: mkdir -p ~/.ssh
       - name: Write SSH private key
