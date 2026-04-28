@@ -30,6 +30,14 @@ func (c *Copier) Process(absolutePath string) {
 		return
 	}
 
+	// Fast path: skip hashing if path and size match an existing record.
+	if info, err := os.Stat(absolutePath); err == nil {
+		if rec, ok := c.store.GetByPath(relPath); ok && rec.SizeBytes == info.Size() {
+			log.Printf("SKIP: %s (unchanged, size %d)", relPath, info.Size())
+			return
+		}
+	}
+
 	hash, err := HashFile(absolutePath)
 	if err != nil {
 		log.Printf("ERROR: hashing %s: %v", relPath, err)

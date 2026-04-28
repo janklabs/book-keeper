@@ -16,16 +16,18 @@ type Record struct {
 }
 
 type RecordStore struct {
-	mu       sync.Mutex
-	filePath string
-	Records  []Record `json:"records"`
-	hashSet  map[string]bool
+	mu        sync.Mutex
+	filePath  string
+	Records   []Record `json:"records"`
+	hashSet   map[string]bool
+	pathIndex map[string]Record
 }
 
 func NewRecordStore(filePath string) (*RecordStore, error) {
 	store := &RecordStore{
-		filePath: filePath,
-		hashSet:  make(map[string]bool),
+		filePath:  filePath,
+		hashSet:   make(map[string]bool),
+		pathIndex: make(map[string]Record),
 	}
 
 	data, err := os.ReadFile(filePath)
@@ -42,6 +44,7 @@ func NewRecordStore(filePath string) (*RecordStore, error) {
 
 	for _, r := range store.Records {
 		store.hashSet[r.Hash] = true
+		store.pathIndex[r.SourcePath] = r
 	}
 
 	return store, nil
@@ -53,12 +56,20 @@ func (s *RecordStore) HasHash(hash string) bool {
 	return s.hashSet[hash]
 }
 
+func (s *RecordStore) GetByPath(relPath string) (Record, bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	r, ok := s.pathIndex[relPath]
+	return r, ok
+}
+
 func (s *RecordStore) Add(record Record) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.Records = append(s.Records, record)
 	s.hashSet[record.Hash] = true
+	s.pathIndex[record.SourcePath] = record
 
 	return s.flush()
 }
