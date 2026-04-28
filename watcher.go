@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -33,16 +34,18 @@ func NewWatcher(cfg Config, copier *Copier) (*Watcher, error) {
 		pending: make(map[string]*time.Timer),
 	}
 
-	if err := w.addRecursive(cfg.WatchDir); err != nil {
-		fsw.Close()
-		return nil, err
+	for _, dir := range cfg.WatchDirs {
+		if err := w.addRecursive(dir); err != nil {
+			fsw.Close()
+			return nil, fmt.Errorf("watching %s: %w", dir, err)
+		}
 	}
 
 	return w, nil
 }
 
 func (w *Watcher) Start() {
-	log.Printf("Watching %s for new files...", w.cfg.WatchDir)
+	log.Printf("Watching %v for new files...", w.cfg.WatchDirs)
 
 	go func() {
 		for {

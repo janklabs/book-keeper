@@ -19,7 +19,7 @@ func NewCopier(cfg Config, store *RecordStore) *Copier {
 }
 
 func (c *Copier) Process(absolutePath string) {
-	relPath, err := filepath.Rel(c.cfg.WatchDir, absolutePath)
+	relPath, err := c.resolveRelPath(absolutePath)
 	if err != nil {
 		log.Printf("ERROR: resolving relative path for %s: %v", absolutePath, err)
 		return
@@ -42,6 +42,10 @@ func (c *Copier) Process(absolutePath string) {
 	}
 
 	destPath := filepath.Join(c.cfg.IngestionDir, relPath)
+
+	if info, err := os.Stat(destPath); err == nil && !info.IsDir() {
+		log.Printf("WARN: destination %s already exists, will be overwritten by %s", relPath, absolutePath)
+	}
 
 	if err := os.MkdirAll(filepath.Dir(destPath), 0755); err != nil {
 		log.Printf("ERROR: creating destination directory for %s: %v", relPath, err)
@@ -127,4 +131,19 @@ func copyFile(src, dst string) (os.FileInfo, error) {
 	}
 
 	return info, nil
+}
+
+// resolveRelPath finds which watch directory contains the file and returns the relative path.
+func (c *Copier) resolveRelPath(absolutePath string) (string, error) {
+	for _, dir := range c.cfg.WatchDirs {
+		rel, err := filepath.Rel(dir, absolutePath)
+		if err != nil {
+			continue
+		}
+		if len(rel) >= 2 && rel[:2] == ".." {
+			continue
+		}
+		return rel, nil
+	}
+	return "", fmt.Errorf("path %s is not under any watch directory", absolutePath)
 }

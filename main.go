@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 )
 
@@ -34,7 +35,7 @@ func main() {
 	}
 	watcher.Start()
 
-	log.Printf("book-keeper %s is running. WATCH_DIR=%s INGESTION_DIR=%s", version, cfg.WatchDir, cfg.IngestionDir)
+	log.Printf("book-keeper %s is running. WATCH_DIRS=[%s] INGESTION_DIR=%s", version, strings.Join(cfg.WatchDirs, ", "), cfg.IngestionDir)
 
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
